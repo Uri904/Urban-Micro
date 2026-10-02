@@ -2,8 +2,19 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 /// <summary>
+/// Cualquier "piloto" (teclado, IA) implementa esto para manejar un CarController.
+/// Debe ir en el mismo GameObject que el CarController.
+/// </summary>
+public interface IVehicleDriver
+{
+    void GetInput(out float vertical, out float horizontal, out bool brake);
+}
+
+/// <summary>
 /// Controlador arcade para un vehículo de 4 ruedas usando WheelCollider.
 /// Colócalo en el objeto raíz del auto (donde está el Rigidbody).
+/// Si el objeto no tiene ningún componente que implemente IVehicleDriver
+/// (como AIDriver), se maneja con teclado por defecto.
 /// </summary>
 [RequireComponent(typeof(Rigidbody))]
 public class CarController : MonoBehaviour
@@ -31,6 +42,7 @@ public class CarController : MonoBehaviour
     public Vector3 centerOfMassOffset = new Vector3(0f, -0.5f, 0f);
 
     private Rigidbody rb;
+    private IVehicleDriver driver;
     // Offsets entre cada malla visual y su WheelCollider (se calculan al iniciar)
     private Quaternion[] meshRotOffset = new Quaternion[4];
     private Vector3[] meshPosOffset = new Vector3[4];
@@ -46,12 +58,18 @@ public class CarController : MonoBehaviour
 
     void Start()
     {
+        // Se busca aquí (no en Awake) porque un spawner puede agregar el AIDriver
+        // justo después de Instantiate(), y para entonces Awake ya habría corrido.
+        driver = GetComponent<IVehicleDriver>();
         CacheWheelOffsets();
     }
 
     void Update()
     {
-        ReadInput();
+        if (driver != null)
+            driver.GetInput(out inputVertical, out inputHorizontal, out inputBrake);
+        else
+            ReadInput();
     }
 
     void FixedUpdate()

@@ -21,6 +21,26 @@ public class RouteWaypoints : MonoBehaviour
     public float TotalLength { get; private set; }
     public int PointCount => points.Count;
 
+    /// <summary>Punto de salida (primer waypoint).</summary>
+    public Vector3 StartPoint => points.Count > 0 ? points[0] : transform.position;
+
+    /// <summary>Hacia dónde apunta la salida (del primer waypoint al segundo).</summary>
+    public Vector3 StartDirection =>
+        points.Count > 1 ? (points[1] - points[0]).normalized : transform.forward;
+
+    /// <summary>Dirección de la ruta (tangente) a cierta distancia desde la salida.</summary>
+    public Vector3 GetDirectionAtDistance(float distance)
+    {
+        if (points.Count < 2) return transform.forward;
+        distance = Mathf.Clamp(distance, 0f, TotalLength);
+        for (int i = 1; i < points.Count; i++)
+        {
+            if (distance <= cumulative[i])
+                return (points[i] - points[i - 1]).normalized;
+        }
+        return (points[points.Count - 1] - points[points.Count - 2]).normalized;
+    }
+
     void Awake()
     {
         Rebuild();
