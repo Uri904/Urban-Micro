@@ -41,7 +41,6 @@
 *.lighting              unity-yaml
 *.mask                  unity-yaml
 *.mat                   unity-yaml
-*.meta                  unity-yaml
 *.mixer                 unity-yaml
 *.overrideController    unity-yaml
 *.playable              unity-yaml
@@ -150,3 +149,4 @@ Packages/packages-lock.json linguist-generated
 LightingData.asset     binary
 Assets/Scenes/Tracks/Mapa1.unity filter=lfs diff=lfs merge=lfs -text
 *.unity filter=lfs diff=lfs merge=lfs -text
+*.gbx filter=lfs diff=lfs merge=lfs -text
